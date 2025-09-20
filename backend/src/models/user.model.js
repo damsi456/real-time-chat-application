@@ -5,7 +5,8 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
         unique: true,
-        trim: true
+        trim: true,
+        minLength: 4
     },
     email: {
         type: String,
@@ -13,19 +14,28 @@ const userSchema = new mongoose.Schema({
         unique: true,
         lowercase: true,
         match: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
-    }, 
-    fullName: {
-        type: String,
-        default: ""
     },
     password: {
         type: String,
         required: true,
         minLength: 6
     }, 
+    isOnline: {
+        type: Boolean,
+        default: false
+    },
+    lastSeen: {
+        type: Date,
+        default: new Date()
+    },
     profilePic: {
         type: String,
         default: '' 
+    },
+    bio: {
+        type: String,
+        default: '',
+        maxLength: 200
     }
 }, { timestamps: true });
 
