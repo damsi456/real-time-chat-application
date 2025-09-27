@@ -1,17 +1,18 @@
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
-import { generateToken } from "../utils/jwtUtil.js";
+import { generateTokens } from "../utils/jwtUtil.js";
 
-export async function signUp(req, res) {
+export const signUp = async (req, res) => {
     try {
         const { username, email, password, bio } = req.body;
 
+        // Input validation
         if (!username, !email, !password) {
             return res.status(200).json({
                 message: "All required fields should be filled."
             })
         }
-        // Input validation
+        
         if (password.length < 6) {
             return res.status(400).json({
                 message: "Password must be at least 6 characters."
@@ -39,7 +40,7 @@ export async function signUp(req, res) {
 
         // Hashing password
         const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password,salt);
+        const hashedPassword = await bcrypt.hash(password, salt);
 
         const newUser = new User({
             username,
@@ -50,7 +51,7 @@ export async function signUp(req, res) {
 
         if (newUser) {
             await newUser.save();
-            generateToken(newUser._id, res);
+            generateTokens(newUser._id, res); // cookie setting also happens here
 
             res.status(201).json({
                 _id: newUser._id,
@@ -69,10 +70,51 @@ export async function signUp(req, res) {
     }
 } 
 
-export async function logIn (req, res) {
+export const logIn = async (req, res) => {
+    try {
+        const { emailOrUsername, password } = req.body;
 
+        // Validation
+        if (!emailOrUsername || !password) {
+            return res.status(400).json({ message: "All fields are required" });
+        }
+
+        const user = await User.findOne({
+            $or: [
+                { email: emailOrUsername.toLowerCase() },
+                { username: emailOrUsername}
+            ]
+        });
+
+        if (!user || !(await bcrypt.compare(password, user.password))) {
+            return res.status(401).json({ message: "Invalid credentials." });
+        }
+
+        // Generate tokens
+        generateTokens(user._id, res);
+
+        res.status(200).json({
+            _id: user._id,
+            username: user.username,
+            email: user.email,
+            profilePic: user.profilePic,
+            bio: user.bio
+        });
+    } catch (error) {
+        console.log("Error on login", error);
+        res.status(500).json({ message: "Internal server error"});
+    }
 }
 
-export async function logOut (req, res) {
+export const logOut = async (req, res) => {
+    try {
+        // Clear cookies
+        res.cookie('accessToken', '', { maxAge: 0 });
+        res.cookie('refreshToken', '', { maxAge: 0 });
 
+        res.status(200).json({ message: "Logged out successfully" });
+    } catch (error) {
+        console.log("Error on logout", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
 } 
