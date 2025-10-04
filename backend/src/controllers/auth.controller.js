@@ -7,7 +7,7 @@ export const signUp = async (req, res) => {
         const { username, email, password, bio } = req.body;
 
         // Input validation
-        if (!username, !email, !password) {
+        if (!username || !email || !password) {
             return res.status(200).json({
                 message: "All required fields should be filled."
             })
@@ -106,7 +106,7 @@ export const logIn = async (req, res) => {
     }
 }
 
-export const logOut = async (req, res) => {
+export const logOut = (req, res) => {
     try {
         // Clear cookies
         res.cookie('accessToken', '', { maxAge: 0 });
@@ -118,3 +118,4 @@ export const logOut = async (req, res) => {
         res.status(500).json({ message: "Internal server error" });
     }
 } 
+

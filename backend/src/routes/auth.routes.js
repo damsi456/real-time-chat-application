@@ -11,11 +11,11 @@ router.post('/login', logIn);
 router.post('/logout', authenticateUser, logOut);
 
 // test route
-router.get('/verify-auth', authenticateUser, (req, res) => {
-    res.status(200).json({
-        userId: req.user.userId,
-        message: "Your JWT is working correctly!"
-    })
-})
+// router.get('/verify-auth', authenticateUser, (req, res) => {
+//     res.status(200).json({
+//         userId: req.user.userId,
+//         message: "Your JWT is working correctly!"
+//     })
+// })
 
 export default router;
