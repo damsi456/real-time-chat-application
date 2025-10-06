@@ -31,7 +31,7 @@ export const authenticateUser = async (req, res, next) => {
         
         // Try to use the refresh token
         if (!refreshToken) {
-            return res.status(401).json({ message: "Not authenticated. (No refresh token.)"});
+            return res.status(401).json({ message: "Not authenticated."});
         }
         
         // Verify refresh token

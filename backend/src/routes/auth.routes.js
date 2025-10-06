@@ -1,10 +1,11 @@
 import express from 'express';
 import { signUp, logIn, logOut } from '../controllers/auth.controller.js';
 import { authenticateUser } from '../middlewares/authenticateUser.js';
+import upload from '../config/multer.js';
 
 const router = express.Router();
 
-router.post('/signup', signUp);
+router.post('/signup', upload.single('profilePic'), signUp);
 
 router.post('/login', logIn);
 

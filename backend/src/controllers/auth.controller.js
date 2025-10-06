@@ -1,10 +1,12 @@
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
+import cloudinary from "../config/cloudinary.js";
 import { generateTokens } from "../utils/jwtUtil.js";
 
 export const signUp = async (req, res) => {
     try {
         const { username, email, password, bio } = req.body;
+        const profilePicFile = req.file;
 
         // Input validation
         if (!username || !email || !password) {
@@ -42,11 +44,22 @@ export const signUp = async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
+        let profilePic = '';
+        // Only upload image if its provided
+        if (profilePicFile) {
+            // Converting to base 64 as it's supported by cloudinary. (as we're using memorystroge in multer and not saving to the disk.)
+            const fileBase64 = `data:${profilePicFile.mimetype};base64,${profilePicFile.buffer.toString('base64')}`;
+
+            const uploadResponse = await cloudinary.uploader.upload(fileBase64);
+            profilePic = uploadResponse.secure_url;
+        }
+
         const newUser = new User({
             username,
             email,
             password: hashedPassword,
-            bio: bio || ''
+            bio: bio || '',
+            profilePic
         })
 
         if (newUser) {
@@ -94,11 +107,14 @@ export const logIn = async (req, res) => {
         generateTokens(user._id, res);
 
         res.status(200).json({
-            _id: user._id,
-            username: user.username,
-            email: user.email,
-            profilePic: user.profilePic,
-            bio: user.bio
+            message: "Login successful",
+            data: {
+                _id: user._id,
+                username: user.username,
+                email: user.email,
+                profilePic: user.profilePic,
+                bio: user.bio 
+            }
         });
     } catch (error) {
         console.log("Error on login", error);
