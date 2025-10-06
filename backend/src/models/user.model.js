@@ -29,8 +29,14 @@ const userSchema = new mongoose.Schema({
     //     default: new Date()
     // },
     profilePic: {
-        type: String,
-        default: '' 
+        url: {
+            type: String,
+            default: '' 
+        },
+        publicId: {
+            type: String,
+            default: ''
+        }
     },
     bio: {
         type: String,

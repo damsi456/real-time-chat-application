@@ -44,14 +44,21 @@ export const signUp = async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        let profilePic = '';
+        let profilePic = {
+            url: '',
+            publicId: ''
+        };
+
         // Only upload image if its provided
         if (profilePicFile) {
             // Converting to base 64 as it's supported by cloudinary. (as we're using memorystroge in multer and not saving to the disk.)
             const fileBase64 = `data:${profilePicFile.mimetype};base64,${profilePicFile.buffer.toString('base64')}`;
 
             const uploadResponse = await cloudinary.uploader.upload(fileBase64);
-            profilePic = uploadResponse.secure_url;
+            profilePic = {
+                url: uploadResponse.secure_url,
+                publicId: uploadResponse.public_id
+            };
         }
 
         const newUser = new User({

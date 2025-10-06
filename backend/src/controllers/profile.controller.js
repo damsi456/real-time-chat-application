@@ -22,8 +22,17 @@ export const updateProfile = async (req, res) => {
             // Converting to base 64 as it's supported by cloudinary. (as we're using memorystroge in multer and not saving to the disk.)
             const fileBase64 = `data:${profilePicFile.mimetype};base64,${profilePicFile.buffer.toString('base64')}`;
 
+            // Delete user's old image
+            const user = await User.findById(userId);
+            if (user.profilePic && user.profilePic.publicId) {
+                await cloudinary.uploader.destroy(user.profilePic.publicId);
+            }
+
             const uploadResponse = await cloudinary.uploader.upload(fileBase64);
-            updateData.profilePic = uploadResponse.secure_url;
+            updateData.profilePic = {
+                url: uploadResponse.secure_url,
+                publicId: uploadResponse.public_id
+            };
         }
 
         // Only update if there are changes
@@ -57,6 +66,15 @@ export const deleteProfile = async (req, res) => {
             return res.status(404).json({
                 message: 'User not found'
             });
+        }
+
+        // Delete pfp
+        if (user.profilePic && user.profilePic.publicId) {
+            try {
+                await cloudinary.uploader.destroy(user.profilePic.publicId);
+            } catch (err) {
+                console.log("Error deleting profile image from Cloudinary", err);
+            }
         }
 
         // Clear auth cookies
