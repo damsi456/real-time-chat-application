@@ -47,3 +47,26 @@ export const updateProfile = async (req, res) => {
         res.status(500).json({ message: "Internal server error." });
     }
 }
+
+export const deleteProfile = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const user = await User.findByIdAndDelete(userId);
+        
+        if (!user) {
+            return res.status(404).json({
+                message: 'User not found'
+            });
+        }
+
+        // Clear auth cookies
+        res.cookie('accessToken', '', { maxAge: 0 });
+        res.cookie('refreshToken', '', { maxAge: 0 });
+
+        res.status(200).json({ message: "User profile deleted successfully!" });
+
+    } catch (error) {
+        console.log("Error deleting user profile.", error);
+        res.status(500).json({ message: "Failed to delete user profile." });
+    }
+}
