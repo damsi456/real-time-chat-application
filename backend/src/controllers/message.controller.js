@@ -29,7 +29,7 @@ export const getMessages = async (req, res) => {
                 { senderId: currentUserId, receiverId: userToChatId },
                 { senderId: userToChatId, receiverId: currentUserId }
             ]
-        });
+        }).sort({ createdAt: 1 }); // Oldest first
 
         res.status(200).json({
             message: "Messages fetched successfully.",
@@ -52,7 +52,13 @@ export const sendMessage = async (req, res) => {
         if ((!text || text.trim() ==='') && !imageFile) {
             return res.status(400).json({
                 message: "Message cannot be empty. Please provide text or an image."
-            })
+            });
+        }
+
+        if (text.length > 1000) {
+            return res.status(400).json({
+                message: "Message is too long. Maximum 1000 characters allowed."
+            });
         }
 
         console.log("File (message image) received:", req.file ? "Yes" : "No");
@@ -87,3 +93,33 @@ export const sendMessage = async (req, res) => {
         res.status(500).json({ message: "Couldn't send message." });
     }
 }
+
+export const deleteMessage = async(req, res) => {
+    try {
+        const { messageId } = req.params;
+        const userId = req.user._id;
+
+        // Validation
+        const message = await Message.findById(messageId);
+
+        if (!message) {
+            return res.status(404).json({ message: "Message not found." });
+        }
+
+        if (message.senderId.toString() !== userId.toString()) {
+            return res.status(403).json({ message: "You don't have permission to delete this message." });
+        }
+
+        // Delete image from cloudinary
+        if (message.image.publicId) {
+            await cloudinary.uploader.destroy(message.image.publicId);
+        }
+
+        await Message.findByIdAndDelete(messageId);
+
+        res.status(200).json({ message: "Message deleted successfully." });
+    } catch (error) {
+        console.log("Error on deleting message.", error);
+        res.status(500).json({ message: "Couldn't delete message." });
+    }
+};
