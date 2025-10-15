@@ -3,6 +3,7 @@ import { useAuthStore } from "../store/useAuthStore";
 import AuthDecoration from "../components/AuthDecoration";
 import { Eye, EyeOff, Loader2, Lock, Mail, MessageSquare, User } from "lucide-react";
 import { Link } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const SignUpPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -14,11 +15,43 @@ const SignUpPage = () => {
   const { signUp, isSigningUp } = useAuthStore();
 
   const validateForm = () => {
+    const username = formData.username.trim();
+    const email = formData.email.trim().toLowerCase();
+    const password = formData.password;
 
+    if (!username) {
+      toast.error("Username is required.");
+      return null;
+    }
+    if (!email) {
+      toast.error("Email is required.");
+      return null;
+    }
+    if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(formData.email)) {
+      toast.error("Invalid email format");
+      return null;
+    }
+    if (!password.trim()) {
+      toast.error("Password is required.");
+      return null;
+    }
+    if (password.trim().length < 8) {
+      toast.error("Password must be at least 8 characters.");
+      return null;
+    }
+    return { username, email, password: password.trim() };
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    const payload = validateForm();
+    if (!payload) return;
+
+    try {
+      await signUp(payload)
+    } catch (err) {
+      toast.error(err?.message || "Failed to sign up");
+    }
   };
 
   return (
@@ -53,7 +86,7 @@ const SignUpPage = () => {
                 <input 
                   type="text"
                   className="input input-primary w-full pl-10" 
-                  placeholder="jondoe"
+                  placeholder="johndoe"
                   value={formData.username}
                   onChange={(e) => setFormData({...formData, username: e.target.value})}
                 />
