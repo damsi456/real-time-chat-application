@@ -10,14 +10,15 @@ export const signUp = async (req, res) => {
 
         // Input validation
         if (!username || !email || !password) {
-            return res.status(200).json({
+            // console.log("Payload came to the backend validation of all fields.")
+            return res.status(400).json({
                 message: "All required fields should be filled."
             })
         }
         
-        if (password.length < 6) {
+        if (password.length < 8) {
             return res.status(400).json({
-                message: "Password must be at least 6 characters."
+                message: "Password must be at least 8 characters."
             });
         }
 
