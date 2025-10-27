@@ -5,6 +5,5 @@ export const useThemeStore = create((set) => ({
     setTheme: (theme) => {
         localStorage.setItem("chat-app-theme", theme)
         set({ theme })
-        
     }
 })) 
