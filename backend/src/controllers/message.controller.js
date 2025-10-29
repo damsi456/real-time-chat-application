@@ -55,7 +55,7 @@ export const sendMessage = async (req, res) => {
             });
         }
 
-        if (text.length > 1000) {
+        if (text && text.length > 1000) {
             return res.status(400).json({
                 message: "Message is too long. Maximum 1000 characters allowed."
             });
@@ -78,8 +78,8 @@ export const sendMessage = async (req, res) => {
             receiverId,
             text: text || '',
             image: {
-                url: imageUrl,
-                publicId: imagePublicId
+                url: imageUrl || '',
+                publicId: imagePublicId || ''
             } 
         })
 
