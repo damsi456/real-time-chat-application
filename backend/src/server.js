@@ -7,9 +7,10 @@ import { connectDB } from './config/db.js';
 import authRoutes from './routes/auth.routes.js';  
 import profileRoutes from './routes/profile.routes.js';
 import messageRoutes from './routes/message.routes.js'; 
+import { app, server } from './config/socket.js';
 
 dotenv.config();
-const app = express();
+
 const PORT = process.env.PORT; 
 
 app.use(express.json());
@@ -24,7 +25,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/messages', messageRoutes);
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`App is listening on port ${PORT}.`);
     connectDB();
 }); 

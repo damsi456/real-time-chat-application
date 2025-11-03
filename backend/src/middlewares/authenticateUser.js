@@ -5,9 +5,6 @@ export const authenticateUser = async (req, res, next) => {
     try{
         const accessToken = req.cookies.accessToken;
         const refreshToken = req.cookies.refreshToken;
-        
-        console.log("Access token present:", !!accessToken);
-        console.log("Refresh token present:", !!refreshToken);
 
         // Verify the access token
         if (accessToken) {
