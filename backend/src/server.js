@@ -25,6 +25,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/messages', messageRoutes);
 
+// Start the HTTP server that has both the Express and Socket.IO
 server.listen(PORT, () => {
     console.log(`App is listening on port ${PORT}.`);
     connectDB();

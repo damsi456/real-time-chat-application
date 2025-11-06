@@ -2,10 +2,10 @@ import { Server } from "socket.io";
 import http from "http";
 import express from "express";
 
-const app = express();
-const server = http.createServer(app);
+const app = express(); // the express app
+const server = http.createServer(app);  // Wrap express app in HTTP server
 
-const io = new Server(server, {
+const io = new Server(server, { // Attach Socket.IO to HTTP server 
     cors: {
         origin: ["http://localhost:5173"]
     }
