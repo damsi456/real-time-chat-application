@@ -19,15 +19,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
         minLength: 6
-    }, 
-    // isOnline: {
-    //     type: Boolean,
-    //     default: false
-    // },
-    // lastSeen: {
-    //     type: Date,
-    //     default: new Date()
-    // },
+    },
     profilePic: {
         url: {
             type: String,
