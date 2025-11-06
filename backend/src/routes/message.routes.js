@@ -6,6 +6,6 @@ import { getUsersForSidebar, getMessages, sendMessage } from '../controllers/mes
 const router = express.Router();
 
 router.get("/users", authenticateUser, getUsersForSidebar);
-router.get("/:userId", authenticateUser, getMessages);
+router.get("/receive/:userId", authenticateUser, getMessages);
 router.post("/send/:userId", authenticateUser, upload.single('image'), sendMessage);
 export default router;
